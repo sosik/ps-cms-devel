@@ -14,3 +14,14 @@ set completeopt-=preview
 syntastic/
 tern_for_vim/
 vim-javascript-syntax/ 
+
+
+npm install -g grunt-cli
+
+Color schema
+http://bytefluent.com/vivify/
+corporation
+
+~/.vim/colors/
+
+~/.vimrc <- colorscheme corporation
