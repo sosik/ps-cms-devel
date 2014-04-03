@@ -9,6 +9,9 @@ module.exports = function(grunt) {
 	grunt.registerTask('build:client', ['copy:html']);
 
 	grunt.registerTask('build', ['clean:build', 'build:client', 'build:server']);
+	grunt.registerTask('test', ['build', 'mochaTest']);
+
+	grunt.registerTask('default', ['build', 'test']);
 
 	grunt.initConfig({
 		copy: {
