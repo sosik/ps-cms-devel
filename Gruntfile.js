@@ -9,7 +9,9 @@ module.exports = function(grunt) {
 	grunt.registerTask('build:client', ['copy:html']);
 
 	grunt.registerTask('build', ['clean:build', 'build:client', 'build:server']);
-	grunt.registerTask('test', ['build', 'mochaTest']);
+	grunt.registerTask('test', ['build', 'unitTest', 'integrationTest']);
+	grunt.registerTask('unitTest', ['build', 'mochaTest:unitServer']);
+	grunt.registerTask('integrationTest', ['build', 'mochaTest:integration']);
 
 	grunt.registerTask('default', ['build', 'test']);
 
@@ -27,12 +29,19 @@ module.exports = function(grunt) {
 			}
 		},
 		mochaTest: {
-			server: {
+			unitServer: {
 				options: {
 					reporter: 'spec'
 				},
-				src: ['tests/server/**/*']
+				src: ['tests/unit/server/**/*']
+			},
+			integration: {
+				options: {
+					reporter: 'spec'
+				},
+				src: ['tests/integration/**/*']
 			}
+
 		},
 		watch: {
 			server: {
