@@ -1,2 +1,4 @@
 var MongoClient = require('mongodb').MongoClient;
-module.exports = require('./_mongoDriver')(MongoClient);
+var ObjectId = require('mongodb').ObjectId;
+
+module.exports = require('./_mongoDriver')(MongoClient, ObjectId);
