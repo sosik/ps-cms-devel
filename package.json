@@ -4,7 +4,7 @@
   "description": "pretty simple CMS",
   "main": "server.js",
   "scripts": {
-    "test": "mocha"
+    "test": "grunt unitTest"
   },
   "repository": {
     "type": "git",
