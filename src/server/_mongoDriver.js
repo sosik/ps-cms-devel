@@ -50,6 +50,38 @@ module.exports = function(MongoClient, ObjectID) {
 			}
 			// nothing to mangle
 			return obj;
+		},
+		constructUpdateObject: function(obj) {
+			if (!obj) {
+				return null;
+			}
+
+			var set = {};
+			var unset = {};
+			// TODO handle arrays, functions, etc.
+			var propIterator = function(prefix, obj) {
+				var key;
+				for (key in obj) {
+					// skip id key of object
+					if (key === 'id' && prefix === null) {
+						continue;
+					}
+					if (typeof obj[key] === 'object') {
+						if (obj[key] === null) {
+							unset[prefix === null ? key: prefix + "." + key] = 1;
+						} else {
+							propIterator(prefix === null ? key: prefix + "." + key, obj[key]);
+						}
+					} else {
+						set[prefix === null ? key: prefix + "." + key] = obj[key];
+					}
+				}
+			};
+
+			propIterator(null, obj);
+
+			return {$set: set, $unset: unset};
+
 		}
 	};
 };
