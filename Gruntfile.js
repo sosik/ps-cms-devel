@@ -8,18 +8,23 @@ module.exports = function(grunt) {
 	grunt.registerTask('build:server', ['copy:server']);
 	grunt.registerTask('build:client', ['copy:html']);
 
-	grunt.registerTask('build', ['clean:build', 'build:client', 'build:server']);
+	grunt.registerTask('build', ['clean:build', 'build:client', 'copy:bower', 'build:server']);
 	grunt.registerTask('test', ['build', 'mochaTest:unitServer', 'mochaTest:integration']);
 	grunt.registerTask('unitTest', ['build', 'mochaTest:unitServer']);
 	grunt.registerTask('integrationTest', ['build', 'mochaTest:integration']);
 
-	grunt.registerTask('default', ['build', 'test']);
+	grunt.registerTask('default', ['build', 'unitTest']);
 
 	grunt.initConfig({
 		copy: {
 			html: {
 				files: [
 					{expand: true, cwd: 'src/client', src: ['html/**'], dest: 'build/client/'}
+				]
+			},
+			bower: {
+				files: [
+					{expand: true, cwd: 'bower_components', src: ['**'], dest: 'build/client/html/lib/'}
 				]
 			},
 			server: {
