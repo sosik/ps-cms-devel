@@ -1,9 +1,10 @@
 'use strict';
 
 var express = require('express');
+var path = require('path');
 
 var app = express();
-app.use(express.static(__dirname + '/client/html'));
+app.use(express.static(path.join(process.cwd(), 'build', 'client/html')));
 
 // TODO change behavior based on env property
 app.disable('view cache');
