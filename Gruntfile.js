@@ -6,7 +6,7 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-mocha-test');
 
 	grunt.registerTask('build:server', ['copy:server']);
-	grunt.registerTask('build:client', ['copy:html']);
+	grunt.registerTask('build:client', ['copy:html', 'copy:css', 'copy:js', 'copy:img']);
 
 	grunt.registerTask('build', ['clean:build', 'build:client', 'copy:bower', 'build:server']);
 	grunt.registerTask('test', ['build', 'mochaTest:unitServer', 'mochaTest:integration']);
@@ -19,12 +19,27 @@ module.exports = function(grunt) {
 		copy: {
 			html: {
 				files: [
-					{expand: true, cwd: 'src/client', src: ['html/**'], dest: 'build/client/'}
+					{expand: true, cwd: 'src/client/html', src: ['**'], dest: 'build/client/'}
+				]
+			},
+			css: {
+				files: [
+					{expand: true, cwd: 'src/client/css', src: ['**'], dest: 'build/client/css/'}
+				]
+			},
+			js: {
+				files: [
+					{expand: true, cwd: 'src/client/js', src: ['**'], dest: 'build/client/js'}
+				]
+			},
+			img: {
+				files: [
+					{expand: true, cwd: 'src/client/img', src: ['**'], dest: 'build/client/img'}
 				]
 			},
 			bower: {
 				files: [
-					{expand: true, cwd: 'bower_components', src: ['**'], dest: 'build/client/html/lib/'}
+					{expand: true, cwd: 'bower_components', src: ['**'], dest: 'build/client/lib/'}
 				]
 			},
 			server: {
@@ -53,8 +68,8 @@ module.exports = function(grunt) {
 				files: ['src/server/**'],
 				tasks: ['build:server']
 			},
-			html: {
-				files: ['src/client/html/**'],
+			client: {
+				files: ['src/client/**', 'src/client/html', 'src/client/css', 'src/client/js', 'src/client/img'],
 				tasks: ['build:client']
 			}
 		},
