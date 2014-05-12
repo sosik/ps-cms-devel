@@ -1,10 +1,12 @@
 var expect = require('chai').expect;
+var path = require('path');
 var realMongoClient = require('mongodb').MongoClient;
 var realObjectID = require('mongodb').ObjectID;
+var QueryFilter = require(path.join(process.cwd(), 'build/server/QueryFilter.js'));
 
 describe('_mongoDriver', function() {
 	it('should unmangle mongo ObjectID into string representation', function(done) {
-		var _mongoDriver = require(process.cwd() + '/build/server/_mongoDriver.js')(realMongoClient, realObjectID);
+		var _mongoDriver = require(process.cwd() + '/build/server/_mongoDriver.js')(realMongoClient, realObjectID, QueryFilter);
 		var _id = new realObjectID();
 		var obj = {
 			_id: _id,
@@ -21,7 +23,7 @@ describe('_mongoDriver', function() {
 		done();
 	});
 	it('should mangling text representation of id into mongo ObjectID', function(done) {
-		var _mongoDriver = require(process.cwd() + '/build/server/_mongoDriver.js')(realMongoClient, realObjectID);
+		var _mongoDriver = require(process.cwd() + '/build/server/_mongoDriver.js')(realMongoClient, realObjectID, QueryFilter);
 		var id = '533fddbabdb11f0215c03316';
 		var obj = {
 			id: id,
@@ -38,7 +40,7 @@ describe('_mongoDriver', function() {
 		done();
 	});
 	it('create mongo update object', function(done){
-		var _mongoDriver = require(process.cwd() + '/build/server/_mongoDriver.js')(realMongoClient, realObjectID);
+		var _mongoDriver = require(process.cwd() + '/build/server/_mongoDriver.js')(realMongoClient, realObjectID, QueryFilter);
 
 		var obj = {
 			id: '533fddbabdb11f0215c03316',
@@ -62,6 +64,27 @@ describe('_mongoDriver', function() {
 		expect(updateObject.$set['address.city']).to.be.equal(obj.address.city);
 		expect(updateObject.$set['address.country']).to.be.equal(obj.address.country);
 		expect(updateObject).to.not.include.key('id');
+		done();
+	});
+
+	
+	it('should construct mongo search criteria based on provided QueryFilter', function(done){
+		var _mongoDriver = require(process.cwd() + '/build/server/_mongoDriver.js')(realMongoClient, realObjectID, QueryFilter);
+
+		var qf = QueryFilter.create();
+
+		qf.addCriterium('name', QueryFilter.operation.EQUAL, 'fero')
+		.addCriterium('age').addSort('age').addField('name');
+
+		var mongoSearch = _mongoDriver.constructSearchQuery(qf);
+
+		expect(mongoSearch).to.include.key('selector');
+		expect(mongoSearch.selector).to.include.key('name');
+		expect(mongoSearch.selector).to.include.key('age');
+		expect(mongoSearch).to.include.key('fields');
+		expect(mongoSearch.fields).to.include.key('name');
+		expect(mongoSearch).to.include.key('sort');
+		expect(mongoSearch.sort).to.include.key('age');
 		done();
 	});
 });

@@ -1,4 +1,4 @@
-module.exports = function(MongoClient, ObjectID) {
+module.exports = function(MongoClient, ObjectID, QueryFilter) {
 	var _database = null;
 
 	return {
@@ -81,7 +81,60 @@ module.exports = function(MongoClient, ObjectID) {
 			propIterator(null, obj);
 
 			return {$set: set, $unset: unset};
+		},
+		/**
+		 *
+		 */
+		constructSearchQuery: function(queryFilter) {
+			if (!queryFilter) {
+				throw new Error('Parameter queryFilter is mandatory!');
+			}
 
+			var searchCriteria = {};
+			if (queryFilter.crits) {
+				for (var i = 0; i < queryFilter.crits.length; i++) {
+					var c = queryFilter.crits[i];
+
+					var query;
+
+					if (c.op === QueryFilter.operation.EQUAL) {
+						query = c.v;
+					} else if (c.op === QueryFilter.operation.NOT_EQUAL) {
+						query = {'$ne': c.v};
+					} else if (c.op === QueryFilter.operation.EXISTS) {
+						query = {'$exists' : true};
+					} else {
+						throw new Error('Unsupported operation: ' + c.op);
+					}
+
+					searchCriteria[c.f] = query;
+				}
+			}
+
+			var fields = {};
+			if (queryFilter.fields) {
+				for (var i = 0; i < queryFilter.fields.length; i++) {
+					fields[queryFilter.fields[i]] = 1;
+				}
+			}
+
+			var sorts = {};
+			if (queryFilter.sorts) {
+				for (var i = 0; i < queryFilter.sorts.length; i++) {
+					var s = {};
+					if (queryFilter.sorts[i].o === QueryFilter.sort.ASC) {
+						sorts[queryFilter.sorts[i].f] = 1;
+					} else {
+						sorts[queryFilter.sorts[i].f] = 0;
+					}
+				}
+			}
+
+			return {
+				selector: searchCriteria,
+				fields: fields,
+				sort: sorts
+			};
 		}
 	};
 };
